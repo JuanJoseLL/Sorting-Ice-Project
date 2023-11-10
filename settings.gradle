@@ -1,0 +1,3 @@
+rootProject.name = 'PruebaProyecto3'
+include 'master'
+include 'worker'
