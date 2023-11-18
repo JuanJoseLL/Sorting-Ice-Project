@@ -8,7 +8,7 @@ public class Master {
         // Try with resources block - communicator is automatically destroyed
         // at the end of this try block
         //
-        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, extraArgs))
+        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.master", extraArgs))
         {
             communicator.getProperties().setProperty("Ice.Default.Package", "com.zeroc.demos.IceGrid.simple");
             //
@@ -25,9 +25,7 @@ public class Master {
             else
             {
                 com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Hello");
-                com.zeroc.Ice.Properties properties = communicator.getProperties();
-                com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
-                adapter.add(new HelloI(properties.getProperty("Ice.ProgramName")), id);
+                adapter.add(new HelloI(),com.zeroc.Ice.Util.stringToIdentity("hello"));
                 adapter.activate();
 
                 communicator.waitForShutdown();

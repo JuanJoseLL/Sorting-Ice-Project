@@ -1,19 +1,16 @@
-import Demo.MasterManager;
-import Demo.MasterManagerPrx;
+import Demo.Hello;
+
 import com.zeroc.Ice.Current;
 
-public class HelloI implements MasterManager {
+public class HelloI implements Hello {
 
-    public HelloI(String name)
-    {
-        _name = name;
-    }
 
-    private final String _name;
+
+
 
     @Override
     public void sayHello(Current current) {
-        System.out.println(_name+" Says Hello");
+        System.out.println(" Says Hello");
     }
 
     @Override

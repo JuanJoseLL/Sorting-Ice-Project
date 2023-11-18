@@ -1,6 +1,6 @@
 module Demo
 {
-    interface MasterManager
+    interface Hello
     {
         void sayHello();
         void shutdown();

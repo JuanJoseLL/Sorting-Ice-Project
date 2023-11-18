@@ -1,4 +1,4 @@
-import Demo.MasterManagerPrx;
+import Demo.HelloPrx;
 
 public class Worker {
     public static void main(String[] args) {
@@ -9,7 +9,7 @@ public class Worker {
         // Try with resources block - communicator is automatically destroyed
         // at the end of this try block
         //
-        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs))
+        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.worker", extraArgs))
         {
             communicator.getProperties().setProperty("Ice.Default.Package", "com.zeroc.demos.IceGrid.simple");
 
@@ -33,10 +33,10 @@ public class Worker {
         // identity. If it's not registered with the registry, we
         // search for an object with the ::Demo::Hello type.
         //
-        MasterManagerPrx hello = null;
+        HelloPrx hello = null;
         try
         {
-            hello = MasterManagerPrx.checkedCast(communicator.stringToProxy("hello"));
+            hello = HelloPrx.checkedCast(communicator.stringToProxy("hello"));
         }
         catch(com.zeroc.Ice.NotRegisteredException ex)
         {
