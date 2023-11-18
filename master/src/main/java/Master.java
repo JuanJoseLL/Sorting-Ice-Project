@@ -27,11 +27,8 @@ public class Master {
                 com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Hello");
                 adapter.add(new HelloI(),com.zeroc.Ice.Util.stringToIdentity("hello"));
                 adapter.activate();
-
-                communicator.waitForShutdown();
+                System.exit(status);
             }
         }
-
-        System.exit(status);
     }
 }

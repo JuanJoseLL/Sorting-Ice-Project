@@ -5,4 +5,8 @@ module Demo
         void sayHello();
         void shutdown();
     }
+    interface Clock
+        {
+            void tick(string time);
+        }
 }

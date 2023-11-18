@@ -1,7 +1,12 @@
+import Demo.ClockPrx;
 import Demo.HelloPrx;
+import com.zeroc.IceStorm.NoSuchTopic;
+import com.zeroc.IceStorm.TopicExists;
+import com.zeroc.IceStorm.TopicManagerPrx;
+import com.zeroc.IceStorm.TopicPrx;
 
 public class Worker {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchTopic, TopicExists {
         int status = 0;
         java.util.List<String> extraArgs = new java.util.ArrayList<>();
 
@@ -12,7 +17,6 @@ public class Worker {
         try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.worker", extraArgs))
         {
             communicator.getProperties().setProperty("Ice.Default.Package", "com.zeroc.demos.IceGrid.simple");
-
             if(!extraArgs.isEmpty())
             {
                 System.err.println("too many arguments");
