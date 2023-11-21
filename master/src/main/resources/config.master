@@ -6,6 +6,9 @@
 Hello.Endpoints=tcp -p 9090
 Ice.Default.Locator=DemoIceGrid/Locator:default -h localhost -p 4061
 Clock.Subscriber.Endpoints=tcp:udp
+
+
+
 #
 # Only listen on the localhost interface by default.
 #
