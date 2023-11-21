@@ -1,34 +1,17 @@
+import Demo.WorkerPrx;
 
 public class Master {
     public static void main(String[] args) {
-        int status = 0;
-        java.util.List<String> extraArgs = new java.util.ArrayList<String>();
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args)) {
+            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("Worker:default -p 10000");
+            WorkerPrx worker = WorkerPrx.checkedCast(base);
 
-        //
-        // Try with resources block - communicator is automatically destroyed
-        // at the end of this try block
-        //
-        try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.master", extraArgs))
-        {
-            communicator.getProperties().setProperty("Ice.Default.Package", "com.zeroc.demos.IceGrid.simple");
-            //
-            // Install shutdown hook to (also) destroy communicator during JVM shutdown.
-            // This ensures the communicator gets destroyed when the user interrupts the application with Ctrl-C.
-            //
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> communicator.destroy()));
+            if (worker == null) {
+                throw new Error("Invalid proxy");
+            }
 
-            if(!extraArgs.isEmpty())
-            {
-                System.err.println("too many arguments");
-                status = 1;
-            }
-            else
-            {
-                com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Hello");
-                adapter.add(new HelloI(),com.zeroc.Ice.Util.stringToIdentity("hello"));
-                adapter.activate();
-                System.exit(status);
-            }
+            // Enviar tarea al worker
+            worker.processTask("Tarea 1");
         }
     }
 }

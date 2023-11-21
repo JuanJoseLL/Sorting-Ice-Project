@@ -3,7 +3,7 @@
 # subscriber adapter. These endpoints are where the client receives
 # topic messages from IceStorm.
 #
-Hello.Endpoints=tcp -p 9090
+WorkerI.Endpoints=tcp -p 9090
 Ice.Default.Locator=DemoIceGrid/Locator:default -h localhost -p 4061
 Clock.Subscriber.Endpoints=tcp:udp
 

@@ -1,19 +1,14 @@
 module Demo
 {
-    interface Hello
-    {
-        void sayHello();
-        void shutdown();
+
+    interface Worker{
+        void processTask(string task);
     }
-    interface Clock
-        {
-            void tick(string time);
-        }
     sequence<string> Data;
     sequence<long> StringSeq;
 
     struct Block {
-          ["java:type:java.util.ArrayList<Long>"]Data data;
+          ["java:type:java.util.ArrayList<String>"]Data data;
         }
 
         interface MetadataServer {
