@@ -3,6 +3,7 @@ module Demo
 
     interface Worker{
         void processTask(string task);
+        void subscribe();
     }
     sequence<string> Data;
     sequence<long> StringSeq;
