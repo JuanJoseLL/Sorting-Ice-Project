@@ -4,17 +4,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class TestRead {
     public static void main(String[] args) throws FileNotFoundException {
 
         String fileName = "/Users/juanjose/Documents/Semestre5/Ingesoft/PruebaProyecto3/almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
         String[] data = readDataFromFile(fileName);
-
-
+        List<String> newSortedResults = new ArrayList<>();
+        newSortedResults.addAll(Arrays.asList(data));
 
         long startTime = System.currentTimeMillis();
-        mergeSort(data);
+        Collections.sort(newSortedResults);
+        //mergeSort(data);
         long endTime = System.currentTimeMillis();
 
 

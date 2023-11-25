@@ -12,7 +12,10 @@ Clock.Subscriber.Endpoints=tcp:udp
 #
 # Only listen on the localhost interface by default.
 #
+
+Sorter.Master.Endpoints=tcp -p 9099
 Ice.Default.Host=localhost
+Ice.ThreadPool.Server.Size=5
 
 #
 # This property is used by the clients to connect to IceStorm.

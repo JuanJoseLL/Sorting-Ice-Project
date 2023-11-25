@@ -2,16 +2,14 @@ import Demo.WorkerPrx;
 
 public class Master {
     public static void main(String[] args) {
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args)) {
-            com.zeroc.Ice.ObjectPrx base = communicator.stringToProxy("Worker:default -p 10000");
-            WorkerPrx worker = WorkerPrx.checkedCast(base);
+        java.util.List<String> extraArgs = new java.util.ArrayList<>();
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.master",extraArgs)) {
+            com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Master");
 
-            if (worker == null) {
-                throw new Error("Invalid proxy");
-            }
+            adapter.add(new MasterImpl(), com.zeroc.Ice.Util.stringToIdentity("masterSorter"));
+            adapter.activate();
 
-            // Enviar tarea al worker
-            worker.processTask("Tarea 1");
+            communicator.waitForShutdown();
         }
     }
 }

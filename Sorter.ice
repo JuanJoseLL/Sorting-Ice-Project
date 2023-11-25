@@ -21,5 +21,11 @@ module Demo
             void writeBlock(Block block);
         }
 
+       interface MasterSorter{
+                void attachWorker(Worker* subscriber);
+                void addPartialResult(string res);
+                void deattachWorker(Worker* subscriber);
+                string getTask();
+       }
 
 }
