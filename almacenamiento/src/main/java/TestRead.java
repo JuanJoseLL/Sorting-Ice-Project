@@ -22,6 +22,7 @@ public class TestRead {
                 concatenateFile(fileName, size, outputFile);
                 String[] data = readDataFromFile(outputFile);
             }*/
+
             long startTime = System.currentTimeMillis();
             mergeSort(data);
             long endTime = System.currentTimeMillis();

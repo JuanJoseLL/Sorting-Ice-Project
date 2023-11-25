@@ -1,11 +1,7 @@
-#
-# This property is used to configure the endpoints of the clock
-# subscriber adapter. These endpoints are where the client receives
-# topic messages from IceStorm.
-#
-Worker.Endpoints=tcp -p 9090
-#Ice.Default.Locator=DemoIceGrid/Locator:default -h localhost -p 4061
 
+Worker.Endpoints=tcp -p 9090
+
+#Ice.Default.Locator=DemoIceGrid/Locator:default -h localhost -p 4061
 
 
 #
@@ -17,20 +13,14 @@ Sorter.Master.Endpoints=tcp -p 9099
 Ice.Default.Host=localhost
 Ice.ThreadPool.Server.Size=5
 
+#       ICE STORM
+
 #
 # This property is used by the clients to connect to IceStorm.
 #
 TopicManager.Proxy=DemoIceStorm/TopicManager:default -h localhost -p 10000
 
 #
-# Network Tracing
-#
-# 0 = no network tracing
-# 1 = trace connection establishment and closure
-# 2 = like 1, but more detailed
-# 3 = like 2, but also trace data transfer
-#
-#Ice.Trace.Network=1
 
 # IceMX configuration.
 #
