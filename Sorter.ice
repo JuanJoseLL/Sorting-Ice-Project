@@ -27,6 +27,7 @@ module Demo
                 void addPartialResult(string res);
                 void deattachWorker(Worker* subscriber);
                 string getTask();
+                void initiateSort();
        }
 
 }

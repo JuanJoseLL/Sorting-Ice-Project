@@ -1,27 +1,54 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class TestRead {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
+        boolean flage = true;
+        int count = 0;
+        while(flage) {
 
-        String fileName = "/Users/juanjose/Documents/Semestre5/Ingesoft/PruebaProyecto3/almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
-        String[] data = readDataFromFile(fileName);
-        List<String> newSortedResults = new ArrayList<>();
-        newSortedResults.addAll(Arrays.asList(data));
+            String fileName = "almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
+            String[] data = readDataFromFile(fileName);
 
-        long startTime = System.currentTimeMillis();
-        Collections.sort(newSortedResults);
-        //mergeSort(data);
-        long endTime = System.currentTimeMillis();
+            /*int[] sizes = {3, 5, 7, 9};
+            for (int size : sizes) {
+                String outputFile = "/path/to/output_" + size + "M.txt";
+                concatenateFile(fileName, size, outputFile);
+                String[] data = readDataFromFile(outputFile);
+            }*/
+            long startTime = System.currentTimeMillis();
+            mergeSort(data);
+            long endTime = System.currentTimeMillis();
 
 
-        System.out.println("\nTiempo de ejecución: " + (endTime - startTime) + " milisegundos");
+            System.out.println("\nTiempo de ejecución corrida"+count+ ":"  + (endTime - startTime) + " milisegundos");
+            count++;
+            if(count==10){
+                flage=false;
+            }
+        }
+    }
+
+    private static void concatenateFile(String inputFileName, int times, String outputFileName) throws IOException {
+        Path outputPath = Paths.get(outputFileName);
+        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+            for (int i = 0; i < times; i++) {
+                Files.lines(Paths.get(inputFileName)).forEach(line -> {
+                    try {
+                        writer.write(line);
+                        writer.newLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
     }
     private static String[] readDataFromFile(String fileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -73,13 +100,5 @@ public class TestRead {
             result[k++] = right[j++];
         }
     }
-
-    private static void printArray(String[] array) {
-        for (String str : array) {
-            System.out.print(str + " ");
-        }
-        System.out.println();
-    }
-
 
 }

@@ -8,10 +8,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class MasterImpl implements MasterSorter {
+    private boolean tasksCompleted = false;
     private List<WorkerPrx> workers = new ArrayList<>();
     private List<String> sortedResults = new ArrayList<>();
     @Override
-    public void attachWorker(WorkerPrx subscriber, Current current) {
+    public synchronized void attachWorker(WorkerPrx subscriber, Current current) {
         workers.add(subscriber);
     }
 
@@ -36,4 +37,11 @@ public class MasterImpl implements MasterSorter {
         }
         return null;
     }
+
+    @Override
+    public void initiateSort(Current current) {
+        tasksCompleted = true;
+    }
+
+
 }
