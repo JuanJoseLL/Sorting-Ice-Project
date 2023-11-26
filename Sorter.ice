@@ -4,6 +4,11 @@ module Demo
     interface Worker{
         void processTask(string task);
     }
+
+    interface DataC {
+        void read();
+    }
+
     sequence<string> Data;
     sequence<long> StringSeq;
 

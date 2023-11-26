@@ -7,7 +7,7 @@
 #
 # The IceGrid locator proxy.
 #
-
+DataController.Endpoints=tcp -p 9090
 Ice.Default.Locator=DemoIceGrid/Locator:default -h localhost -p 4061
 
 #
@@ -36,7 +36,7 @@ TopicManager.Proxy=DemoIceStorm/TopicManager:default -h localhost -p 10000
 #Ice.Trace.Network=1
 
 #
-# IceMX configuration.
+#IceMX configuration.
 #
 #Ice.Admin.Endpoints=tcp -h localhost -p 10004
 Ice.Admin.InstanceName=publisher
