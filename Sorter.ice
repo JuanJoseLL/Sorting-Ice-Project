@@ -3,6 +3,7 @@ module Demo
 
     interface Worker{
         void processTask(string task);
+        void subscribe();
     }
     sequence<string> Data;
     sequence<long> StringSeq;
@@ -21,10 +22,12 @@ module Demo
             void writeBlock(Block block);
         }
 
-        interface MasterSorter{
-            void attachWorker(Worker* subscriber);
-            void addPartialResult(string res);
-        }
-
+       interface MasterSorter{
+                void attachWorker(Worker* subscriber);
+                void addPartialResult(string res);
+                void deattachWorker(Worker* subscriber);
+                string getTask();
+                void initiateSort();
+       }
 
 }

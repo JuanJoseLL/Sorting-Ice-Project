@@ -97,7 +97,7 @@ public class Block implements java.lang.Cloneable,
 
     public void ice_readMembers(com.zeroc.Ice.InputStream istr)
     {
-        this.data = new java.util.ArrayList<Long>();
+        this.data = new java.util.ArrayList<String>();
         final int len0 = istr.readAndCheckSeqSize(1);
         for(int i0 = 0; i0 < len0; i0++)
         {
