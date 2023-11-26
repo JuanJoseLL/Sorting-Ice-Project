@@ -20,7 +20,6 @@ public class MasterImpl implements MasterSorter {
     public synchronized void addPartialResult(String res, Current current) {
         List<String> newSortedResults = new ArrayList<>(sortedResults);
         newSortedResults.add(res);
-
         Collections.sort(newSortedResults);
         sortedResults = newSortedResults;
     }

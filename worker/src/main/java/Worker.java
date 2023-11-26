@@ -12,7 +12,7 @@ public class Worker {
         int status = 0;
         java.util.List<String> extraArgs = new java.util.ArrayList<>();
 
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.worker", extraArgs)) {
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "worker.config", extraArgs)) {
             communicator.getProperties().setProperty("Ice.Default.Package","com.zeroc.demos.IceStorm.sorter");
             //
             // Destroy communicator during JVM shutdown
@@ -78,5 +78,5 @@ public class Worker {
             communicator.waitForShutdown();
         }
     }
-
+ 
 }

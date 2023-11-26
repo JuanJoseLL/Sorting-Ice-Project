@@ -7,7 +7,7 @@ public class Master {
         java.util.List<String> extraArgs = new java.util.ArrayList<>();
         int status = 0;
 
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.master",extraArgs)) {
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "master.config",extraArgs)) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> communicator.destroy()));
 
 
