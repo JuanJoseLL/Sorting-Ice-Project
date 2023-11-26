@@ -10,29 +10,40 @@ import java.util.List;
 public class TestRead {
     public static void main(String[] args) throws IOException {
         boolean flage = true;
-        int count = 0;
-        while(flage) {
+
+
 
             String fileName = "almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
-            String[] data = readDataFromFile(fileName);
 
-            /*int[] sizes = {3, 5, 7, 9};
-            for (int size : sizes) {
-                String outputFile = "/path/to/output_" + size + "M.txt";
-                concatenateFile(fileName, size, outputFile);
-                String[] data = readDataFromFile(outputFile);
-            }*/
+
 
             long startTime = System.currentTimeMillis();
+            String[] data = readDataFromFile(fileName);
+
             mergeSort(data);
+            addResult(List.of(data));
+
             long endTime = System.currentTimeMillis();
 
 
-            System.out.println("\nTiempo de ejecución corrida"+count+ ":"  + (endTime - startTime) + " milisegundos");
-            count++;
-            if(count==10){
-                flage=false;
+            System.out.println("\nTiempo de ejecución: "  + (endTime - startTime) + " milisegundos");
+
+
+
+    }
+
+    public static void addResult(List<String> res){
+        // If the size of sortedResults has reached the maximum, write the results to a file and clear the list
+        if (res.size() >= 20000) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("sortedResults.txt", true))) {
+                for (String result : res) {
+                    writer.write(result);
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -55,9 +66,10 @@ public class TestRead {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             StringBuilder content = new StringBuilder();
-
-            while ((line = br.readLine()) != null) {
+            int linecount=0;
+            while ((line = br.readLine()) != null && linecount<20000) {
                 content.append(line).append("\n");
+                linecount++;
             }
 
             return content.toString().trim().split("\\s+");
