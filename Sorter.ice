@@ -21,10 +21,10 @@ module Demo
             Block readBlock(long blockId);
             void writeBlock(Block block);
         }
-
+        sequence<string> result;
        interface MasterSorter{
                 void attachWorker(Worker* subscriber);
-                void addPartialResult(string res);
+                void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
                 void deattachWorker(Worker* subscriber);
                 string getTask();
                 void initiateSort();
