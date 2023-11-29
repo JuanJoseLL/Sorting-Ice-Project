@@ -8,9 +8,9 @@
             <parameter name="index"/>
             <server id="SimpleServer-${index}" exe="java" activation="on-demand">
                 <option>-jar</option>
-                <option>../master/build/libs/master.jar</option>
-                <adapter name="Hello" endpoints="tcp -h localhost" replica-group="ReplicatedHelloAdapter"/>
-                <property name="Identity" value="hello"/>
+                <option>../proxy/build/libs/proxy.jar</option>
+                <adapter name="Sorter" endpoints="tcp -h localhost" replica-group="ReplicatedHelloAdapter"/>
+                <property name="Identity" value="masterSorter"/>
 
                 <property name="IceMX.Metrics.Debug.GroupBy" value="id"/>
                 <property name="IceMX.Metrics.Debug.Disabled" value="1"/>
@@ -21,10 +21,10 @@
 
         <replica-group id="ReplicatedHelloAdapter">
             <load-balancing type="round-robin"/>
-            <object identity="hello" type="::Demo::Hello"/>
+            <object identity="masterSorter" type="::Demo::Sorter"/>
         </replica-group>
 
-        <node name="node1">
+        <node name="node">
             <server-instance template="SimpleServer" index="1"/>
             <server-instance template="SimpleServer" index="2"/>
             <server-instance template="SimpleServer" index="3"/>

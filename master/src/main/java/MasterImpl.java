@@ -57,6 +57,7 @@ public class MasterImpl implements MasterSorter {
 
     @Override
     public void initiateSort(Current current) {
+        System.out.println("llamado metodo desde el master");
         tasksCompleted = true;
     }
 

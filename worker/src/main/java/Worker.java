@@ -1,5 +1,7 @@
 
+import Demo.MasterSorterPrx;
 import com.zeroc.Ice.Communicator;
+import com.zeroc.IceGrid.QueryPrx;
 import com.zeroc.IceStorm.*;
 
 
@@ -24,6 +26,18 @@ public class Worker {
     }
 
     public static void run(Communicator communicator) throws TopicExists {
+        MasterSorterPrx masterProxy = null;
+        try{
+           masterProxy = MasterSorterPrx.checkedCast(
+                    communicator.stringToProxy("masterSorter"));
+        }catch (Exception e){
+            QueryPrx query = QueryPrx.checkedCast(communicator.stringToProxy("DemoIceGrid/Query"));
+            masterProxy = MasterSorterPrx.checkedCast(query.findObjectByType("::Demo::Sorter"));
+            e.printStackTrace();
+        }
+
+        masterProxy.initiateSort();
+        System.out.println("termina");
         try (communicator) {
             // Retrieve the IceStorm Topic Manager
             TopicManagerPrx topicManager = TopicManagerPrx.checkedCast(

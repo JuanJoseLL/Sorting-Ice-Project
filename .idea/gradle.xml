@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/almacenamiento" />
             <option value="$PROJECT_DIR$/master" />
+            <option value="$PROJECT_DIR$/proxy" />
             <option value="$PROJECT_DIR$/worker" />
           </set>
         </option>
