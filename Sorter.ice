@@ -4,6 +4,7 @@ module Demo
     interface Worker{
         void processTask();
          ["java:type:java.util.ArrayList<String>"]sorted returnResult();
+         void getData(["java:type:java.util.ArrayList<String>"]sorted srt);
     }
     sequence<string> Data;
     sequence<long> StringSeq;
