@@ -25,9 +25,9 @@ public class DataGestor implements CallbackFile{
     }
 
     private void addNode(List<String> node) {
-        if (circularList.size() == MAX_NODES) {
-            circularList.removeFirst();
-        }
+        //if (circularList.size() == MAX_NODES) {
+        //    circularList.removeFirst();
+        //}
         circularList.addLast(node);
     }
 
