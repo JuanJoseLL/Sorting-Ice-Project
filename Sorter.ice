@@ -1,9 +1,9 @@
 module Demo
 {
-
+    sequence<string> sorted;
     interface Worker{
-        void processTask(string task);
-        void subscribe();
+        void processTask();
+         ["java:type:java.util.ArrayList<String>"]sorted returnResult();
     }
     sequence<string> Data;
     sequence<long> StringSeq;
