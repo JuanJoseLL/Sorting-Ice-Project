@@ -53,22 +53,22 @@ public interface MasterSorterPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
-    default void addPartialResult(String res)
+    default void addPartialResult(java.util.List<java.lang.String> res)
     {
         addPartialResult(res, com.zeroc.Ice.ObjectPrx.noExplicitContext);
     }
 
-    default void addPartialResult(String res, java.util.Map<String, String> context)
+    default void addPartialResult(java.util.List<java.lang.String> res, java.util.Map<String, String> context)
     {
         _iceI_addPartialResultAsync(res, context, true).waitForResponse();
     }
 
-    default java.util.concurrent.CompletableFuture<Void> addPartialResultAsync(String res)
+    default java.util.concurrent.CompletableFuture<Void> addPartialResultAsync(java.util.List<java.lang.String> res)
     {
         return _iceI_addPartialResultAsync(res, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
     }
 
-    default java.util.concurrent.CompletableFuture<Void> addPartialResultAsync(String res, java.util.Map<String, String> context)
+    default java.util.concurrent.CompletableFuture<Void> addPartialResultAsync(java.util.List<java.lang.String> res, java.util.Map<String, String> context)
     {
         return _iceI_addPartialResultAsync(res, context, false);
     }
@@ -80,11 +80,22 @@ public interface MasterSorterPrx extends com.zeroc.Ice.ObjectPrx
      * @param sync -
      * @return -
      **/
-    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_addPartialResultAsync(String iceP_res, java.util.Map<String, String> context, boolean sync)
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_addPartialResultAsync(java.util.List<java.lang.String> iceP_res, java.util.Map<String, String> context, boolean sync)
     {
         com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "addPartialResult", null, sync, null);
         f.invoke(false, context, null, ostr -> {
-                     ostr.writeString(iceP_res);
+                     if(iceP_res == null)
+                     {
+                         ostr.writeSize(0);
+                     }
+                     else
+                     {
+                         ostr.writeSize(iceP_res.size());
+                         for(String elem : iceP_res)
+                         {
+                             ostr.writeString(elem);
+                         }
+                     }
                  }, null);
         return f;
     }
@@ -159,6 +170,39 @@ public interface MasterSorterPrx extends com.zeroc.Ice.ObjectPrx
                      ret = istr.readString();
                      return ret;
                  });
+        return f;
+    }
+
+    default void initiateSort()
+    {
+        initiateSort(com.zeroc.Ice.ObjectPrx.noExplicitContext);
+    }
+
+    default void initiateSort(java.util.Map<String, String> context)
+    {
+        _iceI_initiateSortAsync(context, true).waitForResponse();
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> initiateSortAsync()
+    {
+        return _iceI_initiateSortAsync(com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> initiateSortAsync(java.util.Map<String, String> context)
+    {
+        return _iceI_initiateSortAsync(context, false);
+    }
+
+    /**
+     * @hidden
+     * @param context -
+     * @param sync -
+     * @return -
+     **/
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_initiateSortAsync(java.util.Map<String, String> context, boolean sync)
+    {
+        com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "initiateSort", null, sync, null);
+        f.invoke(false, context, null, null, null);
         return f;
     }
 

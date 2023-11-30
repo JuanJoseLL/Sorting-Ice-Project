@@ -1,4 +1,5 @@
 import Demo.WorkerPrx;
+import com.zeroc.Ice.Current;
 
 import java.util.Random;
 
@@ -16,6 +17,7 @@ public class Master {
             adapter.activate();
 
             System.out.println("server initialized...");
+
             status = run(communicator, extraArgs.toArray(new String[extraArgs.size()]));
         }
 
@@ -145,5 +147,10 @@ public class Master {
         }
 
         return 0;
+    }
+
+    //Voy a llamar este metodo desde DataGestor con la string del status
+    public void printStatus(String lol) {
+        System.out.println(lol);
     }
 }

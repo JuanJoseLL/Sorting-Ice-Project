@@ -23,11 +23,17 @@ module Demo
         }
         sequence<string> result;
        interface MasterSorter{
-                void attachWorker(Worker* subscriber);
-                void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
+                ["amd"]void attachWorker(Worker* subscriber);
+                ["amd"]void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
                 void deattachWorker(Worker* subscriber);
-                string getTask();
-                void initiateSort();
+                ["amd"]string getTask();
+                void initiateSort(bool flag);
+
        }
+       interface CallbackFile  {
+            void fileReadStat(bool flag);
+            void processFile();
+            ["java:type:java.util.ArrayList<String>"]result readData();
+       };
 
 }

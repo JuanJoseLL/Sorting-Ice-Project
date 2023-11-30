@@ -1,3 +1,5 @@
+import Demo.CallbackFilePrx;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -6,29 +8,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Util;
 public class TestRead {
+    public TestRead() throws FileNotFoundException {
+    }
+
     public static void main(String[] args) throws IOException {
         boolean flage = true;
 
 
-
-            String fileName = "almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
-
+        String fileName = "almacenamiento/src/main/java/datos.txt"; // Cambia el nombre del archivo según tus necesidades
 
 
-            long startTime = System.currentTimeMillis();
-            String[] data = readDataFromFile(fileName);
+        long startTime = System.currentTimeMillis();
 
-            mergeSort(data);
-            addResult(List.of(data));
+
+        try (Communicator communicator = Util.initialize(args)) {
+
+            CallbackFilePrx callbackFilePrx = CallbackFilePrx.checkedCast(
+                    communicator.stringToProxy("masterSorter:tcp -h localhost -p 9099")
+            );
+            if (callbackFilePrx == null) {
+                System.err.println("Invalid proxy");
+                return;
+            }
+
+
+            DataGestor dataGestor = new DataGestor(fileName);
+            //dataGestor.processFile();
 
             long endTime = System.currentTimeMillis();
-
-
-            System.out.println("\nTiempo de ejecución: "  + (endTime - startTime) + " milisegundos");
-
-
+            System.out.println("\nTiempo de ejecución: " + (endTime - startTime) + " milisegundos");
+        } catch (Exception e) {
+            System.err.println("Error en TestRead: " + e.getMessage());
+            e.printStackTrace();
+        }
 
     }
 
@@ -113,5 +128,7 @@ public class TestRead {
             result[k++] = right[j++];
         }
     }
+
+
 
 }

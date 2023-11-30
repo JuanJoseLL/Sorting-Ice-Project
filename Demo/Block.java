@@ -160,5 +160,5 @@ public class Block implements java.lang.Cloneable,
     private static final Block _nullMarshalValue = new Block();
 
     /** @hidden */
-    public static final long serialVersionUID = -3593502624277597930L;
+    public static final long serialVersionUID = 75493654L;
 }

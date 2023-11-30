@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 public class MasterImpl implements MasterSorter {
     private static final int MAX_RESULTS = 10000;
@@ -15,12 +17,20 @@ public class MasterImpl implements MasterSorter {
     private List<WorkerPrx> workers = new ArrayList<>();
     private List<String> sortedResults = new ArrayList<>();
     @Override
-    public synchronized void attachWorker(WorkerPrx subscriber, Current current) {
-        workers.add(subscriber);
+    public CompletionStage<Void> attachWorkerAsync(WorkerPrx subscriber, Current current) {
+        CompletableFuture<Void> futureResult = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            workers.add(subscriber);
+            futureResult.complete(null);
+        });
+
+            return futureResult;
     }
 
     @Override
-    public void addPartialResult(List<String> res, Current current) {
+    public CompletionStage<Void> addPartialResultAsync(List<String> res, Current current) {
+        CompletableFuture<Void> futureResult = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
         List<String> newSortedResults = new ArrayList<>(sortedResults);
         newSortedResults.addAll(res);
         newSortedResults = mergeSort(newSortedResults);
@@ -39,6 +49,9 @@ public class MasterImpl implements MasterSorter {
 
             sortedResults.clear();
         }
+            futureResult.complete(null);
+        });
+        return futureResult;
     }
 
 
@@ -48,17 +61,29 @@ public class MasterImpl implements MasterSorter {
     }
 
     @Override
-    public String getTask(Current current) {
+    public CompletionStage<String> getTaskAsync(Current current) {
+        CompletableFuture<Void> futureResult = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
         for (WorkerPrx worker : workers){
             worker.processTask("Empieza a trabajar");
         }
+            futureResult.complete(null);
+        });
         return null;
     }
 
     @Override
-    public void initiateSort(Current current) {
+    public void initiateSort(boolean flag, Current current) {
+        //condicion de parada
         tasksCompleted = true;
+        System.out.println("completado");
+        if(flag==true){
+            System.out.println("termino");
+        }else{
+            System.out.println("no termino");
+        }
     }
+
 
     public static List<String> mergeSort(List<String> list) {
         if (list.size() <= 1) {
@@ -98,6 +123,7 @@ public class MasterImpl implements MasterSorter {
     
         return merged;
     }
+
 
 
 }
