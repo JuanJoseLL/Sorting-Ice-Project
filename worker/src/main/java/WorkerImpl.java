@@ -10,7 +10,7 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
 
     private List<String> list;
 
-    private CallbackFilePrx callbackFile;
+    private volatile CallbackFilePrx callbackFile;
 
     public List<String> getList() {
         return list;
@@ -34,9 +34,6 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
         callbackFile=b;
     }
 
-    public WorkerImpl(List<String> c){
-        list=c;
-    }
     @Override
     protected List<String> compute() {
         if (list.size() <= 1) {
@@ -50,8 +47,8 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
         List<String> right = new ArrayList<>(list.subList(middle, list.size()));
 
         // Create tasks to sort the sub-lists recursively
-        WorkerImpl taskLeft = new WorkerImpl(left);
-        WorkerImpl taskRight = new WorkerImpl(right);
+        WorkerImpl taskLeft = new WorkerImpl(left, callbackFile);
+        WorkerImpl taskRight = new WorkerImpl(right, callbackFile);
 
         // Perform the tasks in parallel
         invokeAll(taskLeft, taskRight);
