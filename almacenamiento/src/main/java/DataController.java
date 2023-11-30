@@ -41,6 +41,7 @@ public class DataController {
         }
 
         dataGestor.setMasterSorterPrx(realMaster);
+        System.out.println("voy a leer los datos");
         while (true){
             callbackFilePrx.readData();
         }

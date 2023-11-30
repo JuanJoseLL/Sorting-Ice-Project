@@ -12,8 +12,8 @@ import Demo.MasterSorterPrx;
 
 public class DataGestor implements CallbackFile{
     private static MasterSorterPrx masterSorterPrx;
-    private static final int MAX_NODES = 6;
-    private static final int MAX_LINES = 100;
+    private static final int MAX_NODES = 4;
+    private static final int MAX_LINES = 1;
     private LinkedList<List<String>> circularList = new LinkedList<>();
     BufferedReader reader;
 
@@ -30,34 +30,54 @@ public class DataGestor implements CallbackFile{
         //}
         circularList.addLast(node);
     }
+    private List<String> readNextLines() {
+        List<String> lines = new LinkedList<>();
+        try {
+            String line;
+            while (lines.size() < MAX_LINES && (line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
 
 
     @Override
     public void fileReadStat(boolean flag, Current current) {
-            masterSorterPrx.initiateSort(flag);
+        masterSorterPrx.initiateSort(flag);
     }
 
     @Override
     public void processFile(Current current)  {
-        String line;
         List<String> node = new ArrayList<>();
         while (true) {
+            String line;
             try {
-                if (!((line = reader.readLine()) != null)) break;
+                line = reader.readLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            if (node.size() < MAX_LINES) {
-                node.add(line);
+            if (line == null) {
+                // End of file reached
+                if (!node.isEmpty()) {
+                    addNode(node);
+                }
+                break;
+            }
 
-            } else if (node.size()==MAX_LINES) {
+            node.add(line);
+
+            if (node.size() == MAX_LINES) {
                 addNode(node);
+                if (circularList.size() >= MAX_NODES) {
+                    // Stop adding new nodes if MAX_NODES is reached
+                    break;
+                }
                 node = new ArrayList<>();
             }
-        }
-        if (!node.isEmpty()) {
-            addNode(node);
         }
 
     }
@@ -65,37 +85,22 @@ public class DataGestor implements CallbackFile{
     @Override
     public List<String> readData(Current current){
 
-        List<String> data = circularList.removeFirst();
-        //No elimina
-        String line;
-        List<String> node = new ArrayList<>();
-        while (true) {
-            try {
-                if (!((line = reader.readLine()) != null)) break;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        if (circularList.isEmpty()) {
+            return null;
+        }
 
-            if (node.size() < MAX_LINES) {
-                node.add(line);
+        List<String> headNode = circularList.poll(); // Retrieves and removes the head
 
-            } else if (node.size()==MAX_LINES) {
-                addNode(node);
-                node = new ArrayList<>();
+        // Only read and add new lines if there are more lines in the file
+        if (circularList.size() < MAX_NODES) {
+            List<String> newNode = readNextLines();
+            if (newNode != null && !newNode.isEmpty()) {
+                circularList.add(newNode); // Add new lines as a node to the tail
             }
         }
-        if (!node.isEmpty()) {
-            addNode(node);
-        }
-        if(circularList.size()==0){
-            fileReadStat(true, current);
-            System.out.println("llega a cero");
-        }else{
-            System.out.println("no llega a 0");
-            fileReadStat(false, current);
-        }
-
-        return data;
+        System.out.println(circularList.size());
+        System.out.println(headNode);
+        return headNode;
     }
 
 
