@@ -18,13 +18,14 @@ public class MasterProxyImpl implements MasterSorter {
     }
 
     @Override
-    public CompletionStage<Void> attachWorkerAsync(WorkerPrx subscriber, Current current) {
-        return null;
+    public void attachWorker(WorkerPrx subscriber, Current current) {
+
     }
 
     @Override
-    public CompletionStage<Void> addPartialResultAsync(List<String> res, Current current) {
-        return null;
+    public void addPartialResult(List<String> res, Current current) {
+        System.out.println("Pasa por el proxy manda el result");
+        realMaster.addPartialResult(res);
     }
 
     @Override
@@ -33,13 +34,13 @@ public class MasterProxyImpl implements MasterSorter {
     }
 
     @Override
-    public CompletionStage<String> getTaskAsync(Current current) {
+    public String getTask(Current current) {
         return null;
     }
 
     @Override
     public void initiateSort(boolean flag, Current current) {
         System.out.println("pasa por el proxy");
-        realMaster.initiateSort(true);
+
     }
 }

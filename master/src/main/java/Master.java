@@ -121,13 +121,14 @@ public class Master {
             publisher = publisher.ice_oneway();
         }
         WorkerPrx worker = WorkerPrx.uncheckedCast(publisher);
-
+        MasterSorterPrx masterProxy = MasterSorterPrx.checkedCast(
+                communicator.stringToProxy("masterSorter"));
         System.out.println("publishing tick events. Press ^C to terminate the application.");
         try
         {
             while(!masterPrx.tasksCompleted)
             {
-
+                System.out.println("LLama a proccess task");
                 worker.processTask();
 
                 try

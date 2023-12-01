@@ -41,7 +41,7 @@ public class Worker {
             masterProxy = MasterSorterPrx.checkedCast(query.findObjectByType("::Demo::Sorter"));
             e.printStackTrace();
         }
-        //masterProxy.initiateSort(false);
+
         System.out.println("termina");
         try (communicator) {
             // Retrieve the IceStorm Topic Manager
@@ -60,7 +60,11 @@ public class Worker {
                 topic = topicManager.create("time");
             }
             com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Worker");
-            adapter.add(new WorkerImpl(), com.zeroc.Ice.Util.stringToIdentity("worker"));
+            CallbackFilePrx almacenamiento = CallbackFilePrx.checkedCast(
+                    communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
+
+            WorkerImpl sorter = new WorkerImpl(almacenamiento.readData(), almacenamiento, masterProxy);
+            adapter.add(sorter, com.zeroc.Ice.Util.stringToIdentity("worker"));
             try {
                 topic.subscribeAndGetPublisher(null, adapter.createDirectProxy(com.zeroc.Ice.Util.stringToIdentity("worker")));
             } catch (AlreadySubscribed | InvalidSubscriber | BadQoS e) {
@@ -69,22 +73,23 @@ public class Worker {
 
             //Comunicación con almacenamiento
 
-            CallbackFilePrx almacenamiento = CallbackFilePrx.checkedCast(
-                    communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
 
             WorkerPrx sorterPrx =
                     WorkerPrx.uncheckedCast(adapter.createProxy(
                             com.zeroc.Ice.Util.stringToIdentity("worker")));
 
             //System.out.println(almacenamiento.readData());
-            ForkJoinPool pool = new ForkJoinPool();
-            WorkerImpl sorter = new WorkerImpl(almacenamiento.readData(), almacenamiento);
+            //WorkerImpl sorter = new WorkerImpl(almacenamiento.readData(), almacenamiento);
             //sorter.setCallbackFile(almacenamiento);
             //sorterPrx.getData(almacenamiento.readData());
-            List<String> resultado = pool.invoke(sorter);
-            for (String s :resultado) {
-                System.out.println(s);
-            }
+
+                masterProxy.addPartialResult(sorterPrx.returnResult());
+                List<String> resultado = sorterPrx.returnResult();
+                for (String s :resultado) {
+                    System.out.println(s);
+                }
+
+
             // Activate the adapter
             adapter.activate();
 

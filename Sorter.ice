@@ -24,10 +24,10 @@ module Demo
         }
         sequence<string> result;
        interface MasterSorter{
-                ["amd"]void attachWorker(Worker* subscriber);
-                ["amd"]void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
+                void attachWorker(Worker* subscriber);
+                void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
                 void deattachWorker(Worker* subscriber);
-                ["amd"]string getTask();
+                string getTask();
                 void initiateSort(bool flag);
 
        }

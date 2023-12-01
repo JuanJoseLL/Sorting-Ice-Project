@@ -12,25 +12,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class MasterImpl implements MasterSorter {
-    private static final int MAX_RESULTS = 10000;
+    private static final int MAX_RESULTS = 2;
     public boolean tasksCompleted = false;
     private List<WorkerPrx> workers = new ArrayList<>();
     private List<String> sortedResults = new ArrayList<>();
     @Override
-    public CompletionStage<Void> attachWorkerAsync(WorkerPrx subscriber, Current current) {
-        CompletableFuture<Void> futureResult = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
+    public void attachWorker(WorkerPrx subscriber, Current current) {
             workers.add(subscriber);
-            futureResult.complete(null);
-        });
-
-            return futureResult;
     }
 
     @Override
-    public CompletionStage<Void> addPartialResultAsync(List<String> res, Current current) {
-        CompletableFuture<Void> futureResult = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
+    public void addPartialResult(List<String> res, Current current) {
+        System.out.println("entra al método en el master");
+
+
         List<String> newSortedResults = new ArrayList<>(sortedResults);
         newSortedResults.addAll(res);
         newSortedResults = mergeSort(newSortedResults);
@@ -43,15 +38,16 @@ public class MasterImpl implements MasterSorter {
                     writer.write(result);
                     writer.newLine();
                 }
+                System.out.println("Crea el arcivo con los resultados");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             sortedResults.clear();
         }
-            futureResult.complete(null);
-        });
-        return futureResult;
+
+        System.out.println("sale del metodo");
+
     }
 
 
@@ -61,14 +57,10 @@ public class MasterImpl implements MasterSorter {
     }
 
     @Override
-    public CompletionStage<String> getTaskAsync(Current current) {
-        CompletableFuture<Void> futureResult = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
+    public String getTask(Current current) {
         for (WorkerPrx worker : workers){
             worker.processTask();
         }
-            futureResult.complete(null);
-        });
         return null;
     }
 

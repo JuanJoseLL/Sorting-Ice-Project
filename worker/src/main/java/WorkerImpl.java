@@ -1,16 +1,22 @@
 import Demo.CallbackFilePrx;
+import Demo.MasterSorterPrx;
 import Demo.Worker;
 import com.zeroc.Ice.Current;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RecursiveTask;
 
-public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
+public class WorkerImpl implements Worker {
 
     private List<String> list;
 
     private volatile CallbackFilePrx callbackFile;
+
+    private MasterSorterPrx masterPrx;
+
+    public void setMasterPrx(MasterSorterPrx masterPrx) {
+        this.masterPrx = masterPrx;
+    }
 
     public List<String> getList() {
         return list;
@@ -20,22 +26,20 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
         this.list = list;
     }
 
-    public CallbackFilePrx getCallbackFile() {
-        return callbackFile;
-    }
 
     public void setCallbackFile(CallbackFilePrx callbackFile) {
         this.callbackFile = callbackFile;
     }
 
     public WorkerImpl() {}
-    public WorkerImpl(List<String> a, CallbackFilePrx b) {
+    public WorkerImpl(List<String> a, CallbackFilePrx b, MasterSorterPrx c) {
         list=a;
         callbackFile=b;
+        masterPrx=c;
     }
 
-    @Override
-    protected List<String> compute() {
+    public List<String> mergeSort(List<String> list) {
+        System.out.println("Entra al merge sort");
         if (list.size() <= 1) {
             return list; // If the list size is 0 or 1, it's already sorted
         }
@@ -46,15 +50,12 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
         List<String> left = new ArrayList<>(list.subList(0, middle));
         List<String> right = new ArrayList<>(list.subList(middle, list.size()));
 
-        // Create tasks to sort the sub-lists recursively
-        WorkerImpl taskLeft = new WorkerImpl(left, callbackFile);
-        WorkerImpl taskRight = new WorkerImpl(right, callbackFile);
+        // Sort the sub-lists recursively
+        left = mergeSort(left);
+        right = mergeSort(right);
 
-        // Perform the tasks in parallel
-        invokeAll(taskLeft, taskRight);
-
-        // Merge the results of the tasks
-        return merge(taskLeft.join(), taskRight.join());
+        // Merge the results
+        return merge(left, right);
     }
 
     private List<String> merge(List<String> left, List<String> right) {
@@ -86,13 +87,15 @@ public class WorkerImpl extends RecursiveTask<List<String>> implements Worker {
     @Override
     public void processTask(Current current) {
         list=callbackFile.readData();
+        mergeSort(list);
+        System.out.println("Se va al carajo");
         System.out.println(list);
         System.out.println("hola");
     }
 
     @Override
     public List<String> returnResult(Current current) {
-        return null;
+        return list;
     }
 
     @Override
