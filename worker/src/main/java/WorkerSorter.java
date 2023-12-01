@@ -1,30 +1,31 @@
 import Demo.Worker;
 import com.zeroc.Ice.Current;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.ForkJoinPool;
 
-public class WorkerSorter extends RecursiveTask<String[]>{
+public class WorkerSorter extends RecursiveTask<List<String>>{
 
-    private String[] array;
+    private List<String> array;
 
-    public WorkerSorter(String[] array) {
+    public WorkerSorter(List<String> array) {
         this.array = array;
     }
 
     @Override
-    protected String[] compute() {
-        if (array.length <= 1) {
+    protected List<String> compute() {
+        if (array.size() <= 1) {
             return array; // Si el tamaño del array es 0 o 1, ya está ordenado
         }
 
-        int medio = array.length / 2;
+        int medio = array.size() / 2;
 
         // Divide el array en dos sub-arrays
-        String[] izquierda = Arrays.copyOfRange(array, 0, medio);
-        String[] derecha = Arrays.copyOfRange(array, medio, array.length);
+        List<String> izquierda = array.subList( 0, medio);
+        List<String> derecha = array.subList(medio, array.size());
 
         // Crea tareas para ordenar los sub-arrays de forma recursiva
         WorkerSorter tareaIzquierda = new WorkerSorter(izquierda);
@@ -37,27 +38,27 @@ public class WorkerSorter extends RecursiveTask<String[]>{
         return merge(tareaIzquierda.join(), tareaDerecha.join());
     }
 
-    private String[] merge(String[] izquierda, String[] derecha) {
-        String[] resultante = new String[izquierda.length + derecha.length];
+    private List<String> merge(List<String> izquierda, List<String> derecha) {
+        List<String> resultante = new ArrayList<>();
         int i = 0, j = 0, k = 0;
 
         // Combina los sub-arrays ordenados
-        while (i < izquierda.length && j < derecha.length) {
-            if (izquierda[i].compareTo(derecha[j]) < 0) {
-                resultante[k++] = izquierda[i++];
+        while (i < izquierda.size() && j < derecha.size()) {
+            if (izquierda.get(i).compareTo(derecha.get(j)) < 0) {
+                resultante.add(k++,izquierda.get(i++));
             } else {
-                resultante[k++] = derecha[j++];
+                resultante.add(k++,derecha.get(j++));
             }
         }
 
         // Copia los elementos restantes de izquierda (si hay alguno)
-        while (i < izquierda.length) {
-            resultante[k++] = izquierda[i++];
+        while (i < izquierda.size()) {
+            resultante.add(k++,izquierda.get(i++));
         }
 
         // Copia los elementos restantes de derecha (si hay alguno)
-        while (j < derecha.length) {
-            resultante[k++] = derecha[j++];
+        while (j < derecha.size()) {
+            resultante.add(k++,derecha.get(j++));
         }
 
         return resultante;

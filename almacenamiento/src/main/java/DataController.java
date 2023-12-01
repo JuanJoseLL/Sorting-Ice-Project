@@ -24,7 +24,7 @@ public class DataController {
         }
     }
     public static void run(Communicator communicator) throws FileNotFoundException {
-        DataGestor dataGestor=new DataGestor("almacenamiento/src/main/java/testData.txt");
+        DataGestor dataGestor=new DataGestor("almacenamiento/src/main/java/datos.txt");
         com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Storage");
         adapter.add(dataGestor, com.zeroc.Ice.Util.stringToIdentity("callbackFile"));
         adapter.activate();

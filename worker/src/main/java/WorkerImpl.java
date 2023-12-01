@@ -5,6 +5,7 @@ import com.zeroc.Ice.Current;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 public class WorkerImpl implements Worker {
 
@@ -86,11 +87,14 @@ public class WorkerImpl implements Worker {
     @Override
     public void processTask(Current current) {
         list=callbackFile.readData();
-        mergeSort(list);
+        WorkerSorter sorter = new WorkerSorter(list);
+        ForkJoinPool fork = new ForkJoinPool();
+
+        //mergeSort(list);
         System.out.println("Se va al carajo");
         System.out.println(list);
         System.out.println("hola");
-        masterPrx.addPartialResult(list);
+        masterPrx.addPartialResult(fork.invoke(sorter));
     }
 
     @Override

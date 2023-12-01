@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class MasterImpl implements MasterSorter {
-    private static final int MAX_RESULTS = 21;
+    private static final int MAX_RESULTS = 10000;
     public boolean tasksCompleted = false;
     private List<WorkerPrx> workers = new ArrayList<>();
     private List<String> sortedResults = new ArrayList<>();

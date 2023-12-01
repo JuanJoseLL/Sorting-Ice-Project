@@ -12,8 +12,8 @@ import Demo.MasterSorterPrx;
 
 public class DataGestor implements CallbackFile{
     private static MasterSorterPrx masterSorterPrx;
-    private static final int MAX_NODES = 4;
-    private static final int MAX_LINES = 3;
+    private static final int MAX_NODES = 10;
+    private static final int MAX_LINES = 10000;
     private LinkedList<List<String>> circularList = new LinkedList<>();
     BufferedReader reader;
 
