@@ -95,10 +95,10 @@ public class Worker {
                     //masterProxy.addPartialResult(sorterPrx.returnResult());
                 count++;
 
-            List<String> resultado = sorterPrx.returnResult();
-            for (String s :resultado) {
-                System.out.println(s);
-            }
+           // List<String> resultado = sorterPrx.returnResult();
+           // for (String s :resultado) {
+           //     System.out.println(s);
+           // }
 
             // Wait for termination
             communicator.waitForShutdown();

@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class MasterImpl implements MasterSorter {
-    private static final int MAX_RESULTS = 2;
+    private static final int MAX_RESULTS = 21;
     public boolean tasksCompleted = false;
     private List<WorkerPrx> workers = new ArrayList<>();
     private List<String> sortedResults = new ArrayList<>();
@@ -24,7 +24,7 @@ public class MasterImpl implements MasterSorter {
     @Override
     public void addPartialResult(List<String> res, Current current) {
         System.out.println("entra al método en el master");
-
+        System.out.println(sortedResults);
 
         List<String> newSortedResults = new ArrayList<>(sortedResults);
         newSortedResults.addAll(res);
@@ -32,7 +32,7 @@ public class MasterImpl implements MasterSorter {
         sortedResults = newSortedResults;
 
         // If the size of sortedResults has reached the maximum, write the results to a file and clear the list
-        //if (sortedResults.size() >= MAX_RESULTS) {
+        if (sortedResults.size() >= MAX_RESULTS) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("sortedResults.txt", true))) {
                 for (String result : sortedResults) {
                     writer.write(result);
@@ -42,9 +42,12 @@ public class MasterImpl implements MasterSorter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            System.out.println("Entra al if");
+            System.out.println(sortedResults);
+            System.out.println(sortedResults.size());
             sortedResults.clear();
-        //}
+        }
+
 
         System.out.println("sale del metodo");
 
