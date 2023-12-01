@@ -9,6 +9,7 @@ import com.zeroc.IceStorm.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 
 
@@ -60,14 +61,19 @@ public class Worker {
             } catch (NoSuchTopic e) {
                 topic = topicManager.create("time");
             }
+            String uniqueSuffix = UUID.randomUUID().toString();
+            String uniqueIdentity = "worker-" + uniqueSuffix;
+            com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(uniqueIdentity);
+
             com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Worker");
             CallbackFilePrx almacenamiento = CallbackFilePrx.checkedCast(
                     communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
 
             WorkerImpl sorter = new WorkerImpl(almacenamiento, masterProxy);
-            adapter.add(sorter, com.zeroc.Ice.Util.stringToIdentity("worker"));
+            adapter.add(sorter, id);
+
             try {
-                topic.subscribeAndGetPublisher(null, adapter.createDirectProxy(com.zeroc.Ice.Util.stringToIdentity("worker")));
+                topic.subscribeAndGetPublisher(null, adapter.createDirectProxy(id));
             } catch (AlreadySubscribed | InvalidSubscriber | BadQoS e) {
                 throw new RuntimeException(e);
             }

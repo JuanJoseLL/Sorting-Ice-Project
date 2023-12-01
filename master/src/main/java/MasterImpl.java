@@ -22,7 +22,7 @@ public class MasterImpl implements MasterSorter {
     }
 
     @Override
-    public void addPartialResult(List<String> res, Current current) {
+    public synchronized void addPartialResult(List<String> res, Current current) {
         System.out.println("entra al método en el master");
         System.out.println(sortedResults);
 
