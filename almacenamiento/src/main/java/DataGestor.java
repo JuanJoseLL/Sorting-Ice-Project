@@ -84,7 +84,7 @@ public class DataGestor implements CallbackFile{
 
     @Override
     public List<String> readData(Current current){
-
+        System.out.println("Entra al read data");
         if (circularList.isEmpty()) {
             return null;
         }

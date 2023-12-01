@@ -31,70 +31,21 @@ public class Master {
     private static int run(Communicator communicator, String[] args, MasterImpl masterPrx)
     {
 
-        String option = "None";
-        String topicName = "time";
-        int i;
-
-        for(i = 0; i < args.length; ++i)
-        {
-            String oldoption = option;
-            if(args[i].equals("--datagram"))
-            {
-                option = "Datagram";
-            }
-            else if(args[i].equals("--twoway"))
-            {
-                option = "Twoway";
-            }
-            else if(args[i].equals("--oneway"))
-            {
-                option = "Oneway";
-            }
-            else if(args[i].startsWith("--"))
-            {
-                usage();
-                return 1;
-            }
-            else
-            {
-                topicName = args[i++];
-                break;
-            }
-
-            if(!oldoption.equals(option) && !oldoption.equals("None"))
-            {
-                usage();
-                return 1;
-            }
-        }
-
-        if(i != args.length)
-        {
-            usage();
-            return 1;
-        }
-
         com.zeroc.IceStorm.TopicManagerPrx manager = com.zeroc.IceStorm.TopicManagerPrx.checkedCast(
                 communicator.propertyToProxy("TopicManager.Proxy"));
-        if(manager == null)
-        {
-            System.err.println("invalid proxy");
-            return 1;
-        }
-
         //
         // Retrieve the topic.
         //
-        com.zeroc.IceStorm.TopicPrx topic;
+        com.zeroc.IceStorm.TopicPrx topic = null;
         try
         {
-            topic = manager.retrieve(topicName);
+            topic = manager.retrieve("time");
         }
         catch(com.zeroc.IceStorm.NoSuchTopic e)
         {
             try
             {
-                topic = manager.create(topicName);
+                topic = manager.create("time");
             }
             catch(com.zeroc.IceStorm.TopicExists ex)
             {
@@ -107,19 +58,8 @@ public class Master {
         // Get the topic's publisher object, and create a Clock proxy with
         // the mode specified as an argument of this application.
         //
-        com.zeroc.Ice.ObjectPrx publisher = topic.getPublisher();
-        if(option.equals("Datagram"))
-        {
-            publisher = publisher.ice_datagram();
-        }
-        else if(option.equals("Twoway"))
-        {
-            // Do nothing.
-        }
-        else // if(oneway)
-        {
-            publisher = publisher.ice_oneway();
-        }
+        com.zeroc.Ice.ObjectPrx publisher = topic.getPublisher().ice_oneway();
+
         WorkerPrx worker = WorkerPrx.uncheckedCast(publisher);
         MasterSorterPrx masterProxy = MasterSorterPrx.checkedCast(
                 communicator.stringToProxy("masterSorter"));

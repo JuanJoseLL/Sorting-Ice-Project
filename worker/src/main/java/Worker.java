@@ -70,6 +70,7 @@ public class Worker {
                     communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
 
             WorkerImpl sorter = new WorkerImpl(almacenamiento, masterProxy);
+            //com.zeroc.Ice.ObjectPrx proxy = adapter.addWithUUID(sorter).ice_oneway();
             adapter.add(sorter, id);
 
             try {
@@ -108,6 +109,7 @@ public class Worker {
 
             // Wait for termination
             communicator.waitForShutdown();
+            //topic.unsubscribe();
         }
     }
  

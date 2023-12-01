@@ -18,6 +18,7 @@ public class DataController {
             communicator.getProperties().setProperty("Ice.Default.Package", "com.zeroc.demos.Ice.sorter");
             Thread destroyHook = new Thread(communicator::destroy);
             Runtime.getRuntime().addShutdownHook(destroyHook);
+
             run(communicator);
             communicator.waitForShutdown();
 
@@ -25,12 +26,14 @@ public class DataController {
     }
     public static void run(Communicator communicator) throws FileNotFoundException {
         DataGestor dataGestor=new DataGestor("almacenamiento/src/main/java/datos.txt");
+
         com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Storage");
         adapter.add(dataGestor, com.zeroc.Ice.Util.stringToIdentity("callbackFile"));
         adapter.activate();
-        CallbackFilePrx callbackFilePrx =
-                CallbackFilePrx.uncheckedCast(adapter.createProxy(
-                        com.zeroc.Ice.Util.stringToIdentity("callbackFile")));
+
+        CallbackFilePrx callbackFilePrx =  CallbackFilePrx.uncheckedCast(adapter.createProxy(
+                com.zeroc.Ice.Util.stringToIdentity("callbackFile")));
+
         callbackFilePrx.processFile();
         System.out.println("Data G initialized");
         MasterSorterPrx realMaster = MasterSorterPrx.checkedCast(
@@ -42,9 +45,7 @@ public class DataController {
 
         dataGestor.setMasterSorterPrx(realMaster);
         System.out.println("voy a leer los datos");
-        while (true){
-            //callbackFilePrx.readData();
-        }
+
     }
 
 }
