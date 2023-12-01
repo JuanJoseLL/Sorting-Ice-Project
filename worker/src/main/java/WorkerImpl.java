@@ -38,52 +38,6 @@ public class WorkerImpl implements Worker {
         masterPrx=c;
     }
 
-    public List<String> mergeSort(List<String> list) {
-        System.out.println("Entra al merge sort");
-        if (list.size() <= 1) {
-            return list; // If the list size is 0 or 1, it's already sorted
-        }
-
-        int middle = list.size() / 2;
-
-        // Divide the list into two sub-lists
-        List<String> left = new ArrayList<>(list.subList(0, middle));
-        List<String> right = new ArrayList<>(list.subList(middle, list.size()));
-
-        // Sort the sub-lists recursively
-        left = mergeSort(left);
-        right = mergeSort(right);
-
-        // Merge the results
-        return merge(left, right);
-    }
-
-    private List<String> merge(List<String> left, List<String> right) {
-        List<String> result = new ArrayList<>();
-        int i = 0, j = 0;
-
-        // Combine the sorted sub-lists
-        while (i < left.size() && j < right.size()) {
-            if (left.get(i).compareTo(right.get(j)) < 0) {
-                result.add(left.get(i++));
-            } else {
-                result.add(right.get(j++));
-            }
-        }
-
-        // Copy remaining elements of left (if any)
-        while (i < left.size()) {
-            result.add(left.get(i++));
-        }
-
-        // Copy remaining elements of right (if any)
-        while (j < right.size()) {
-            result.add(right.get(j++));
-        }
-
-        return result;
-    }
-
     @Override
     public void processTask(Current current) {
         list=callbackFile.readData();
@@ -91,9 +45,6 @@ public class WorkerImpl implements Worker {
         ForkJoinPool fork = new ForkJoinPool();
 
         //mergeSort(list);
-        System.out.println("Se va al carajo");
-        System.out.println(list);
-        System.out.println("hola");
         masterPrx.addPartialResult(fork.invoke(sorter));
     }
 

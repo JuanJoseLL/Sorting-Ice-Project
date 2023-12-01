@@ -23,8 +23,6 @@ public class MasterImpl implements MasterSorter {
 
     @Override
     public synchronized void addPartialResult(List<String> res, Current current) {
-        System.out.println("entra al método en el master");
-        System.out.println(sortedResults);
 
         List<String> newSortedResults = new ArrayList<>(sortedResults);
         newSortedResults.addAll(res);
@@ -38,12 +36,9 @@ public class MasterImpl implements MasterSorter {
                     writer.write(result);
                     writer.newLine();
                 }
-                System.out.println("Crea el arcivo con los resultados");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("Entra al if");
-            System.out.println(sortedResults);
             System.out.println(sortedResults.size());
             sortedResults.clear();
         }

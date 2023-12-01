@@ -44,7 +44,6 @@ public class Worker {
             e.printStackTrace();
         }
 
-        System.out.println("termina");
         try (communicator) {
             // Retrieve the IceStorm Topic Manager
             TopicManagerPrx topicManager = TopicManagerPrx.checkedCast(
@@ -79,37 +78,15 @@ public class Worker {
                 throw new RuntimeException(e);
             }
 
-            //Comunicación con almacenamiento
-
-
-            WorkerPrx sorterPrx =
-                    WorkerPrx.uncheckedCast(adapter.createProxy(
-                            com.zeroc.Ice.Util.stringToIdentity("worker")));
-
-            //System.out.println(almacenamiento.readData());
-            //WorkerImpl sorter = new WorkerImpl(almacenamiento.readData(), almacenamiento);
-            //sorter.setCallbackFile(almacenamiento);
-            //sorterPrx.getData(almacenamiento.readData());
-
+            //Comunicación con almacenamient
 
 
             // Activate the adapter
             adapter.activate();
 
-
-            int count = 0 ;
-
-                    //masterProxy.addPartialResult(sorterPrx.returnResult());
-                count++;
-
-           // List<String> resultado = sorterPrx.returnResult();
-           // for (String s :resultado) {
-           //     System.out.println(s);
-           // }
-
             // Wait for termination
             communicator.waitForShutdown();
-            //topic.unsubscribe();
+            topic.unsubscribe(adapter.createDirectProxy(id));
         }
     }
  

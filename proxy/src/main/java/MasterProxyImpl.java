@@ -24,7 +24,6 @@ public class MasterProxyImpl implements MasterSorter {
 
     @Override
     public void addPartialResult(List<String> res, Current current) {
-        System.out.println("Pasa por el proxy manda el result");
         realMaster.addPartialResult(res);
     }
 
@@ -40,7 +39,6 @@ public class MasterProxyImpl implements MasterSorter {
 
     @Override
     public void initiateSort(boolean flag, Current current) {
-        System.out.println("pasa por el proxy");
 
     }
 }
