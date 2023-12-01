@@ -7,6 +7,7 @@ import com.zeroc.Ice.Communicator;
 import com.zeroc.IceGrid.QueryPrx;
 import com.zeroc.IceStorm.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
@@ -63,7 +64,7 @@ public class Worker {
             CallbackFilePrx almacenamiento = CallbackFilePrx.checkedCast(
                     communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
 
-            WorkerImpl sorter = new WorkerImpl(almacenamiento.readData(), almacenamiento, masterProxy);
+            WorkerImpl sorter = new WorkerImpl(almacenamiento, masterProxy);
             adapter.add(sorter, com.zeroc.Ice.Util.stringToIdentity("worker"));
             try {
                 topic.subscribeAndGetPublisher(null, adapter.createDirectProxy(com.zeroc.Ice.Util.stringToIdentity("worker")));
@@ -83,15 +84,21 @@ public class Worker {
             //sorter.setCallbackFile(almacenamiento);
             //sorterPrx.getData(almacenamiento.readData());
 
-                masterProxy.addPartialResult(sorterPrx.returnResult());
-                List<String> resultado = sorterPrx.returnResult();
-                for (String s :resultado) {
-                    System.out.println(s);
-                }
 
 
             // Activate the adapter
             adapter.activate();
+
+
+            int count = 0 ;
+
+                    //masterProxy.addPartialResult(sorterPrx.returnResult());
+                count++;
+
+            List<String> resultado = sorterPrx.returnResult();
+            for (String s :resultado) {
+                System.out.println(s);
+            }
 
             // Wait for termination
             communicator.waitForShutdown();

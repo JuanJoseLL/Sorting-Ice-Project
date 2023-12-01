@@ -32,7 +32,7 @@ public class MasterImpl implements MasterSorter {
         sortedResults = newSortedResults;
 
         // If the size of sortedResults has reached the maximum, write the results to a file and clear the list
-        if (sortedResults.size() >= MAX_RESULTS) {
+        //if (sortedResults.size() >= MAX_RESULTS) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("sortedResults.txt", true))) {
                 for (String result : sortedResults) {
                     writer.write(result);
@@ -44,7 +44,7 @@ public class MasterImpl implements MasterSorter {
             }
 
             sortedResults.clear();
-        }
+        //}
 
         System.out.println("sale del metodo");
 

@@ -32,8 +32,7 @@ public class WorkerImpl implements Worker {
     }
 
     public WorkerImpl() {}
-    public WorkerImpl(List<String> a, CallbackFilePrx b, MasterSorterPrx c) {
-        list=a;
+    public WorkerImpl( CallbackFilePrx b, MasterSorterPrx c) {
         callbackFile=b;
         masterPrx=c;
     }
@@ -91,6 +90,7 @@ public class WorkerImpl implements Worker {
         System.out.println("Se va al carajo");
         System.out.println(list);
         System.out.println("hola");
+        masterPrx.addPartialResult(list);
     }
 
     @Override
