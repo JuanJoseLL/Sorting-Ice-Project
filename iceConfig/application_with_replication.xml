@@ -9,7 +9,7 @@
             <server id="SimpleServer-${index}" exe="java" activation="on-demand">
                 <option>-jar</option>
                 <option>../proxy/build/libs/proxy.jar</option>
-                <adapter name="Sorter" endpoints="tcp -h localhost" replica-group="ReplicatedHelloAdapter"/>
+                <adapter name="Sorter" endpoints="tcp -h 10.147.19.115" replica-group="ReplicatedHelloAdapter"/>
                 <property name="Identity" value="masterSorter"/>
 
                 <property name="IceMX.Metrics.Debug.GroupBy" value="id"/>

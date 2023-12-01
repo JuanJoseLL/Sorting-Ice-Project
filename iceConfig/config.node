@@ -2,10 +2,10 @@
 # IceGrid node configuration.
 #
 
-Ice.Default.Locator=DemoIceGrid/Locator:tcp -h localhost -p 4061
+Ice.Default.Locator=DemoIceGrid/Locator:tcp -h 10.147.19.115 -p 4061
 
 IceGrid.Node.Name=node
-IceGrid.Node.Endpoints=default -h localhost -p 12346
+IceGrid.Node.Endpoints=default -h 10.147.19.115 -p 12346
 IceGrid.Node.Data=db/node
 # IceGrid.Node.CollocateRegistry=1
 #IceGrid.Node.Output=db

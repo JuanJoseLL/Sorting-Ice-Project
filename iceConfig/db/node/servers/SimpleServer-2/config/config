@@ -1,11 +1,11 @@
-# Configuration file (12/01/23 09:08:37.331)
+# Configuration file (12/01/23 10:39:40.403)
 
 # Server configuration
 Ice.Admin.ServerId=SimpleServer-2
 Ice.Admin.Endpoints=tcp -h localhost
 Ice.ProgramName=SimpleServer-2
 # Object adapter Sorter
-Sorter.Endpoints=tcp -h localhost
+Sorter.Endpoints=tcp -h 10.147.19.115
 Sorter.AdapterId=SimpleServer-2.Sorter
 Sorter.ReplicaGroupId=ReplicatedHelloAdapter
 # Server descriptor properties
@@ -14,4 +14,4 @@ IceMX.Metrics.Debug.GroupBy=id
 IceMX.Metrics.Debug.Disabled=1
 IceMX.Metrics.ByParent.GroupBy=parent
 IceMX.Metrics.ByParent.Disabled=1
-Ice.Default.Locator=DemoIceGrid/Locator:tcp -h localhost -p 4061
+Ice.Default.Locator=DemoIceGrid/Locator:tcp -h 10.147.19.115 -p 4061
