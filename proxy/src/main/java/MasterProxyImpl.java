@@ -23,7 +23,7 @@ public class MasterProxyImpl implements MasterSorter {
     }
 
     @Override
-    public void addPartialResult(List<String> res, Current current) {
+    public void addPartialResult(byte[] res, Current current) {
         realMaster.addPartialResult(res);
     }
 

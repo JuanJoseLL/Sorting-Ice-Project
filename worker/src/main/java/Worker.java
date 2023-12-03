@@ -66,7 +66,7 @@ public class Worker {
 
             com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Sorter.Worker");
             CallbackFilePrx almacenamiento = CallbackFilePrx.checkedCast(
-                    communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(10).ice_secure(false);
+                    communicator.propertyToProxy("Storage.Proxy")).ice_twoway().ice_timeout(1500).ice_secure(false);
 
             WorkerImpl sorter = new WorkerImpl(almacenamiento, masterProxy);
             adapter.add(sorter, id);

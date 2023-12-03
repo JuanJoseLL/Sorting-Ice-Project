@@ -37,7 +37,7 @@ public class DataController {
         callbackFilePrx.processFile();
         System.out.println("Data G initialized");
         MasterSorterPrx realMaster = MasterSorterPrx.checkedCast(
-                communicator.propertyToProxy("MasterSorter.Proxy")).ice_twoway().ice_timeout(1).ice_secure(false);
+                communicator.propertyToProxy("MasterSorter.Proxy")).ice_twoway().ice_timeout(1500).ice_secure(false);
         if(realMaster == null){
             System.out.println("real master null");
             return;

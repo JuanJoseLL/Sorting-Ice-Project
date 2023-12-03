@@ -4,9 +4,14 @@ import Demo.Worker;
 import com.zeroc.Ice.Current;
 
 import javax.swing.plaf.IconUIResource;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class WorkerImpl implements Worker {
     private int cont = 0;
@@ -42,14 +47,40 @@ public class WorkerImpl implements Worker {
 
     @Override
     public void processTask(Current current) {
-        cont ++;
+        cont++;
         System.out.println("Sort # "+cont);
-        list=callbackFile.readData();
-        WorkerSorter sorter = new WorkerSorter(list);
+        byte[] compressedData = callbackFile.readData();
+        List<String> decompressedData = decompressNode(compressedData); // Decompress the data
+        WorkerSorter sorter = new WorkerSorter(decompressedData);
         ForkJoinPool fork = new ForkJoinPool();
-        masterPrx.addPartialResult(fork.invoke(sorter));
+        List<String> sortedData = fork.invoke(sorter);
+        byte[] recompressedData = compressNode(sortedData); // Rec
+
+        masterPrx.addPartialResult(recompressedData);
     }
 
+    private byte[] compressNode(List<String> node) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+            for (String line : node) {
+                gzipOutputStream.write(line.getBytes(StandardCharsets.UTF_8));
+            }
+            gzipOutputStream.close();
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error during node compression", e);
+        }
+    }
+
+    private List<String> decompressNode(byte[] compressedNode) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedNode);
+             GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8))) {
+            return bufferedReader.lines().collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Error during node decompression", e);
+        }
+    }
     @Override
     public List<String> returnResult(Current current) {
         return list;

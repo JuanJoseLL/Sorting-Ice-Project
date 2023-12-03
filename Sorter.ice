@@ -8,6 +8,7 @@ module Demo
     }
     sequence<string> Data;
     sequence<long> StringSeq;
+    sequence<byte> ByteSeq;
 
     struct Block {
           ["java:type:java.util.ArrayList<String>"]Data data;
@@ -25,7 +26,7 @@ module Demo
         sequence<string> result;
        interface MasterSorter{
                 void attachWorker(Worker* subscriber);
-                void addPartialResult(["java:type:java.util.ArrayList<String>"]result res);
+                void addPartialResult(ByteSeq res);
                 void deattachWorker(Worker* subscriber);
                 string getTask();
                 void initiateSort(bool flag);
@@ -34,7 +35,7 @@ module Demo
        interface CallbackFile  {
             void fileReadStat(bool flag);
             void processFile();
-            ["java:type:java.util.ArrayList<String>"]result readData();
+            ByteSeq readData();
        };
 
 }

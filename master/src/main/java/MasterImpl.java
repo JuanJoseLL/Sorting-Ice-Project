@@ -2,12 +2,10 @@ import Demo.MasterSorter;
 import Demo.WorkerPrx;
 import com.zeroc.Ice.Current;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 public class MasterImpl implements MasterSorter {
     public boolean tasksCompleted = false;
@@ -33,7 +33,7 @@ public class MasterImpl implements MasterSorter {
     }
 
     @Override
-    public synchronized void addPartialResult(List<String> res, Current current) {
+    public synchronized void addPartialResult(byte[] res, Current current) {
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             // Logic to process the result
             if (cont == 0) {
@@ -46,22 +46,28 @@ public class MasterImpl implements MasterSorter {
 
                 AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
 
-                StringBuilder sb = new StringBuilder();
-                for (String s : res) {
-                    sb.append(s).append(System.lineSeparator());
-                }
-                ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+                ByteBuffer buffer = ByteBuffer.wrap(res);
                 Future<Integer> operation = fileChannel.write(buffer, 0);
 
                 // Ensure the operation is completed before closing the channel
-                operation.get(); // This waits for the operation to complete
+                //operation.get(); // This waits for the operation to complete
                 fileChannel.close();
-            } catch (IOException | InterruptedException | ExecutionException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
         workerFutures.add(future);
 
+    }
+
+    private List<String> decompressNode(byte[] compressedNode) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedNode);
+             GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8))) {
+            return bufferedReader.lines().collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Error during node decompression", e);
+        }
     }
 
 
@@ -71,7 +77,10 @@ public class MasterImpl implements MasterSorter {
 
         // Open all files and add the first element of each to the priority queue
         for (Path path : tempFiles) {
-            BufferedReader reader = Files.newBufferedReader(path);
+            // Decompress data from file
+            byte[] compressedData = Files.readAllBytes(path);
+            List<String> decompressedLines = decompressNode(compressedData);
+            BufferedReader reader = new BufferedReader(new StringReader(String.join(System.lineSeparator(), decompressedLines)));
             readers.add(reader);
             String line = reader.readLine();
             if (line != null) {
@@ -129,17 +138,18 @@ public class MasterImpl implements MasterSorter {
     @Override
     public void initiateSort(boolean flag, Current current) {
         CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(workerFutures.toArray(new CompletableFuture[0]));
-
         // Introduce a delay of 5 seconds
         allDoneFuture.thenRunAsync(() -> {
             // Sorting logic after all workers are done
-            tasksCompleted = true;
+
             endTime = System.nanoTime();
             long duration = (endTime - startTime);
             double seconds = (double) duration / 1_000_000_000.0;
+            tasksCompleted = true;
+            System.out.println("El sort tomó " + (seconds-2) + " segundos.");
             try {
                 mergeSortedFiles("finalSortedResults.txt"); // Merging and creating the final file
-                System.out.println("El sort tomó " + (seconds-2) + " segundos.");
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

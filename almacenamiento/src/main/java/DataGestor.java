@@ -1,13 +1,13 @@
 import Demo.CallbackFile;
 import com.zeroc.Ice.Current;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
+
 import Demo.MasterSorterPrx;
 
 public class DataGestor implements CallbackFile{
@@ -15,7 +15,7 @@ public class DataGestor implements CallbackFile{
     private static final int MAX_NODES = 20;
     private static final int MAX_LINES = 48000; // 0.9 MB, cada 10 mil líneass equivalen a 0,2 MB , lo maximo que permite ice es 1MB
 
-    private LinkedList<List<String>> circularList = new LinkedList<>();
+    private LinkedList<byte[]> circularList = new LinkedList<>();
     BufferedReader reader;
 
     public void setMasterSorterPrx(MasterSorterPrx masterSorterPrx){
@@ -25,7 +25,7 @@ public class DataGestor implements CallbackFile{
         reader = new BufferedReader(new FileReader(archive));
     }
 
-    private void addNode(List<String> node) {
+    private void addNode(byte[] node) {
         //if (circularList.size() == MAX_NODES) {
         //    circularList.removeFirst();
         //}
@@ -64,7 +64,7 @@ public class DataGestor implements CallbackFile{
             if (line == null) {
                 // End of file reached
                 if (!node.isEmpty()) {
-                    addNode(node);
+                    addNode(compressNode(node));
                 }
                 break;
             }
@@ -72,7 +72,7 @@ public class DataGestor implements CallbackFile{
             node.add(line);
 
             if (node.size() == MAX_LINES) {
-                addNode(node);
+                addNode(compressNode(node));
                 if (circularList.size() >= MAX_NODES) {
                     // Stop adding new nodes if MAX_NODES is reached
                     break;
@@ -81,32 +81,45 @@ public class DataGestor implements CallbackFile{
             }
         }
         System.out.println(circularList.size());
-        System.out.println(circularList.getFirst().size());
-        System.out.println(circularList.getLast().size());
+        // Note: These sizes will now be the sizes of compressed data
+        System.out.println(circularList.getFirst().length);
+        System.out.println(circularList.getLast().length);
+    }
 
+    private byte[] compressNode(List<String> node) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+            for (String line : node) {
+                gzipOutputStream.write(line.getBytes(StandardCharsets.UTF_8));
+            }
+            gzipOutputStream.close();
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error during node compression", e);
+        }
     }
 
     @Override
-    public synchronized List<String> readData(Current current){
+    public synchronized byte[] readData(Current current){
         System.out.println("Entra al read data");
         if (circularList.isEmpty()) {
             return null;
         }
 
-        List<String> headNode = circularList.poll(); // Retrieves and removes the head
+        byte[] headNodeCompressed = circularList.poll(); // Retrieves and removes the compressed head
 
         // Only read and add new lines if there are more lines in the file
         if (circularList.size() < MAX_NODES) {
             List<String> newNode = readNextLines();
             if (newNode != null && !newNode.isEmpty()) {
-                circularList.add(newNode); // Add new lines as a node to the tail
+                circularList.add(compressNode(newNode)); // Compress and add new lines as a node to the tail
             }
         }
-        if(circularList.size()==0){
+        if(circularList.size() == 0){
             System.out.println("Lista en 0: ya leyó y proceso todo el archivo");
             masterSorterPrx.initiateSort(true);
         }
-        return headNode;
+        return headNodeCompressed;
     }
 
 
