@@ -12,8 +12,9 @@ import Demo.MasterSorterPrx;
 
 public class DataGestor implements CallbackFile{
     private static MasterSorterPrx masterSorterPrx;
-    private static final int MAX_NODES = 10;
-    private static final int MAX_LINES = 10000;
+    private static final int MAX_NODES = 20;
+    private static final int MAX_LINES = 48000; // 0.9 MB, cada 10 mil líneass equivalen a 0,2 MB , lo maximo que permite ice es 1MB
+
     private LinkedList<List<String>> circularList = new LinkedList<>();
     BufferedReader reader;
 
@@ -79,11 +80,14 @@ public class DataGestor implements CallbackFile{
                 node = new ArrayList<>();
             }
         }
+        System.out.println(circularList.size());
+        System.out.println(circularList.getFirst().size());
+        System.out.println(circularList.getLast().size());
 
     }
 
     @Override
-    public List<String> readData(Current current){
+    public synchronized List<String> readData(Current current){
         System.out.println("Entra al read data");
         if (circularList.isEmpty()) {
             return null;
@@ -98,9 +102,8 @@ public class DataGestor implements CallbackFile{
                 circularList.add(newNode); // Add new lines as a node to the tail
             }
         }
-        System.out.println(circularList.size());
-        System.out.println(headNode);
         if(circularList.size()==0){
+            System.out.println("Lista en 0: ya leyó y proceso todo el archivo");
             masterSorterPrx.initiateSort(true);
         }
         return headNode;

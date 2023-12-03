@@ -68,7 +68,6 @@ public class Master {
         {
             while(!masterPrx.tasksCompleted)
             {
-                System.out.println("LLama a proccess task");
                 worker.processTask();
 
                 try
@@ -89,8 +88,4 @@ public class Master {
         return 0;
     }
 
-    //Voy a llamar este metodo desde DataGestor con la string del status
-    public void printStatus(String lol) {
-        System.out.println(lol);
-    }
 }

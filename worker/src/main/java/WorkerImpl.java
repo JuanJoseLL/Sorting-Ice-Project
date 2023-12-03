@@ -3,11 +3,13 @@ import Demo.MasterSorterPrx;
 import Demo.Worker;
 import com.zeroc.Ice.Current;
 
+import javax.swing.plaf.IconUIResource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
 public class WorkerImpl implements Worker {
+    private int cont = 0;
 
     private List<String> list;
 
@@ -40,11 +42,11 @@ public class WorkerImpl implements Worker {
 
     @Override
     public void processTask(Current current) {
+        cont ++;
+        System.out.println("Sort # "+cont);
         list=callbackFile.readData();
         WorkerSorter sorter = new WorkerSorter(list);
         ForkJoinPool fork = new ForkJoinPool();
-
-        //mergeSort(list);
         masterPrx.addPartialResult(fork.invoke(sorter));
     }
 

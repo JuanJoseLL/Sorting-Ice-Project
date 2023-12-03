@@ -12,9 +12,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class MasterImpl implements MasterSorter {
-    private static final int MAX_RESULTS = 10000;
+    private static final int MAX_RESULTS = 60000;
     public boolean tasksCompleted = false;
     private List<WorkerPrx> workers = new ArrayList<>();
+    private int cont = 0;
+    private long startTime;
+
+    private long endTime;
     private List<String> sortedResults = new ArrayList<>();
     @Override
     public void attachWorker(WorkerPrx subscriber, Current current) {
@@ -23,14 +27,17 @@ public class MasterImpl implements MasterSorter {
 
     @Override
     public synchronized void addPartialResult(List<String> res, Current current) {
+        if (cont == 0){
+            startTime = System.nanoTime();
+            cont ++;
+        }
 
-        List<String> newSortedResults = new ArrayList<>(sortedResults);
-        newSortedResults.addAll(res);
-        newSortedResults = mergeSort(newSortedResults);
-        sortedResults = newSortedResults;
-
+        //List<String> newSortedResults = new ArrayList<>(sortedResults);
+        //newSortedResults.addAll(res);
+        //newSortedResults = mergeSort(newSortedResults);
+        //sortedResults = newSortedResults;
+        sortedResults.addAll(res);
         // If the size of sortedResults has reached the maximum, write the results to a file and clear the list
-        if (sortedResults.size() >= MAX_RESULTS) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("sortedResults.txt", true))) {
                 for (String result : sortedResults) {
                     writer.write(result);
@@ -39,12 +46,10 @@ public class MasterImpl implements MasterSorter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println(sortedResults.size());
             sortedResults.clear();
-        }
 
 
-        System.out.println("sale del metodo");
+
 
     }
 
@@ -66,11 +71,14 @@ public class MasterImpl implements MasterSorter {
     public void initiateSort(boolean flag, Current current) {
         //condicion de parada
         tasksCompleted = true;
+        endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        double seconds = (double) duration / 1_000_000_000.0;
+        System.out.println("El sort tomó " + seconds + " segundos.");
+
         System.out.println("completado");
         if(flag==true){
             System.out.println("termino");
-        }else{
-            System.out.println("no termino");
         }
     }
 
