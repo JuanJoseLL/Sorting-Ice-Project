@@ -2,24 +2,31 @@ import Demo.MasterSorter;
 import Demo.WorkerPrx;
 import com.zeroc.Ice.Current;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.PriorityQueue;
+import java.util.concurrent.*;
 
 public class MasterImpl implements MasterSorter {
-    private static final int MAX_RESULTS = 60000;
     public boolean tasksCompleted = false;
+    private List<CompletableFuture<Void>> workerFutures = new ArrayList<>();
     private List<WorkerPrx> workers = new ArrayList<>();
     private int cont = 0;
     private long startTime;
 
     private long endTime;
-    private List<String> sortedResults = new ArrayList<>();
+    private List<Path> tempFiles = new ArrayList<>();
     @Override
     public void attachWorker(WorkerPrx subscriber, Current current) {
             workers.add(subscriber);
@@ -27,30 +34,72 @@ public class MasterImpl implements MasterSorter {
 
     @Override
     public synchronized void addPartialResult(List<String> res, Current current) {
-        if (cont == 0){
-            startTime = System.nanoTime();
-            cont ++;
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            // Logic to process the result
+            if (cont == 0) {
+                startTime = System.nanoTime();
+                cont++;
+            }
+            try {
+                Path tempFile = Files.createTempFile("sorted_chunk_", ".txt");
+                tempFiles.add(tempFile);
+
+                AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(tempFile, StandardOpenOption.WRITE);
+
+                StringBuilder sb = new StringBuilder();
+                for (String s : res) {
+                    sb.append(s).append(System.lineSeparator());
+                }
+                ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+                Future<Integer> operation = fileChannel.write(buffer, 0);
+
+                // Ensure the operation is completed before closing the channel
+                operation.get(); // This waits for the operation to complete
+                fileChannel.close();
+            } catch (IOException | InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        workerFutures.add(future);
+
+    }
+
+
+    public void mergeSortedFiles(String outputFilename) throws IOException {
+        PriorityQueue<FileMergeHelper> pq = new PriorityQueue<>();
+        List<BufferedReader> readers = new ArrayList<>();
+
+        // Open all files and add the first element of each to the priority queue
+        for (Path path : tempFiles) {
+            BufferedReader reader = Files.newBufferedReader(path);
+            readers.add(reader);
+            String line = reader.readLine();
+            if (line != null) {
+                pq.add(new FileMergeHelper(line, reader));
+            }
         }
 
-        //List<String> newSortedResults = new ArrayList<>(sortedResults);
-        //newSortedResults.addAll(res);
-        //newSortedResults = mergeSort(newSortedResults);
-        //sortedResults = newSortedResults;
-        sortedResults.addAll(res);
-        // If the size of sortedResults has reached the maximum, write the results to a file and clear the list
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("sortedResults.txt", true))) {
-                for (String result : sortedResults) {
-                    writer.write(result);
-                    writer.newLine();
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFilename));
+        try {
+            // Merge all files
+            while (!pq.isEmpty()) {
+                FileMergeHelper fmh = pq.poll();
+                writer.write(fmh.line);
+                writer.newLine();
+
+                String nextLine = fmh.reader.readLine();
+                if (nextLine != null) {
+                    pq.add(new FileMergeHelper(nextLine, fmh.reader));
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-            sortedResults.clear();
-
-
-
-
+        } finally {
+            writer.close();
+            // Close all readers
+            for (BufferedReader reader : readers) {
+                reader.close();
+            }
+            // Optionally, delete temp files
+        }
     }
 
 
@@ -67,61 +116,41 @@ public class MasterImpl implements MasterSorter {
         return null;
     }
 
-    @Override
-    public void initiateSort(boolean flag, Current current) {
-        //condicion de parada
-        tasksCompleted = true;
-        endTime = System.nanoTime();
-        long duration = (endTime - startTime);
-        double seconds = (double) duration / 1_000_000_000.0;
-        System.out.println("El sort tomó " + seconds + " segundos.");
-
-        System.out.println("completado");
-        if(flag==true){
-            System.out.println("termino");
-        }
-    }
-
-
-    public static List<String> mergeSort(List<String> list) {
-        if (list.size() <= 1) {
-            return list;
-        }
-    
-        int mid = list.size() / 2;
-        List<String> left = new ArrayList<>(list.subList(0, mid));
-        List<String> right = new ArrayList<>(list.subList(mid, list.size()));
-    
-        return merge(mergeSort(left), mergeSort(right));
-    }
-    
-    private static List<String> merge(List<String> left, List<String> right) {
-        List<String> merged = new ArrayList<>();
-        int leftIndex = 0, rightIndex = 0;
-    
-        while (leftIndex < left.size() && rightIndex < right.size()) {
-            if (left.get(leftIndex).compareTo(right.get(rightIndex)) < 0) {
-                merged.add(left.get(leftIndex));
-                leftIndex++;
-            } else {
-                merged.add(right.get(rightIndex));
-                rightIndex++;
+    private void deleteTemporaryFiles() {
+        for (Path tempFile : tempFiles) {
+            try {
+                Files.deleteIfExists(tempFile);
+            } catch (IOException e) {
+                e.printStackTrace(); // Or handle it based on your application's needs
             }
         }
-    
-        while (leftIndex < left.size()) {
-            merged.add(left.get(leftIndex));
-            leftIndex++;
-        }
-    
-        while (rightIndex < right.size()) {
-            merged.add(right.get(rightIndex));
-            rightIndex++;
-        }
-    
-        return merged;
     }
 
+    @Override
+    public void initiateSort(boolean flag, Current current) {
+        CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(workerFutures.toArray(new CompletableFuture[0]));
+
+        // Introduce a delay of 5 seconds
+        allDoneFuture.thenRunAsync(() -> {
+            // Sorting logic after all workers are done
+            tasksCompleted = true;
+            endTime = System.nanoTime();
+            long duration = (endTime - startTime);
+            double seconds = (double) duration / 1_000_000_000.0;
+            try {
+                mergeSortedFiles("finalSortedResults.txt"); // Merging and creating the final file
+                System.out.println("El sort tomó " + (seconds-2) + " segundos.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            deleteTemporaryFiles();
+
+            System.out.println("completado");
+            if (flag) {
+                System.out.println("termino");
+            }
+        }, CompletableFuture.delayedExecutor(2, TimeUnit.SECONDS, Executors.newSingleThreadExecutor()));
+    }
 
 
 }
